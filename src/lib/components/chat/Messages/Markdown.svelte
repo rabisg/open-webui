@@ -1,13 +1,8 @@
 <script>
-	import { marked } from 'marked';
-	import { replaceTokens, processResponseContent } from '$lib/utils';
-	import { user } from '$lib/stores';
+	// C1-enhanced markdown renderer with full backward compatibility
+	import C1MarkdownRenderer from '$lib/components/c1/C1MarkdownRenderer.svelte';
 
-	import markedExtension from '$lib/utils/marked/extension';
-	import markedKatexExtension from '$lib/utils/marked/katex-extension';
-
-	import MarkdownTokens from './Markdown/MarkdownTokens.svelte';
-
+	// All original props are passed through unchanged
 	export let id = '';
 	export let content;
 	export let done = true;
@@ -15,48 +10,33 @@
 	export let save = false;
 	export let preview = false;
 	export let topPadding = false;
-
 	export let sourceIds = [];
-
 	export let onSave = () => {};
 	export let onUpdate = () => {};
-
 	export let onPreview = () => {};
-
 	export let onSourceClick = () => {};
 	export let onTaskClick = () => {};
 
-	let tokens = [];
-
-	const options = {
-		throwOnError: false,
-		breaks: true
-	};
-
-	marked.use(markedKatexExtension(options));
-	marked.use(markedExtension(options));
-
-	$: (async () => {
-		if (content) {
-			tokens = marked.lexer(
-				replaceTokens(processResponseContent(content), sourceIds, model?.name, $user?.name)
-			);
-		}
-	})();
+	// C1-specific props (optional, no-op for non-C1 models)
+	export let onAction = () => {};
+	export let onUpdateMessage = () => {};
 </script>
 
-{#key id}
-	<MarkdownTokens
-		{tokens}
-		{id}
-		{done}
-		{save}
-		{preview}
-		{topPadding}
-		{onTaskClick}
-		{onSourceClick}
-		{onSave}
-		{onUpdate}
-		{onPreview}
-	/>
-{/key}
+<!-- Delegate to C1-enhanced renderer which handles both C1 and standard models -->
+<C1MarkdownRenderer
+	{id}
+	{content}
+	{done}
+	{model}
+	{save}
+	{preview}
+	{topPadding}
+	{sourceIds}
+	{onSave}
+	{onUpdate}
+	{onPreview}
+	{onSourceClick}
+	{onTaskClick}
+	{onAction}
+	{onUpdateMessage}
+/>

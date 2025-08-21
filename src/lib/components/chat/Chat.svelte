@@ -63,6 +63,9 @@
 		getTagsById,
 		updateChatById
 	} from '$lib/apis/chats';
+	// C1 functionality
+	import { updateChatMessageById } from '$lib/services/c1-chat';
+	import C1ChatWrapper from '$lib/components/c1/C1ChatWrapper.svelte';
 	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
 	import { processWeb, processWebSearch, processYoutubeVideo } from '$lib/apis/retrieval';
 	import { createOpenAITextStream } from '$lib/apis/streaming';
@@ -2153,12 +2156,20 @@
 	}}
 />
 
-<div
-	class="h-screen max-h-[100dvh] transition-width duration-200 ease-in-out {$showSidebar
-		? '  md:max-w-[calc(100%-260px)]'
-		: ' '} w-full max-w-full flex flex-col"
-	id="chat-container"
+<!-- C1 Chat Wrapper provides C1 functionality without modifying core chat logic -->
+<C1ChatWrapper
+	{history}
+	{selectedModels}
+	{sendMessage}
+	{chatId}
+	token={$user?.token || ''}
 >
+	<div
+		class="h-screen max-h-[100dvh] transition-width duration-200 ease-in-out {$showSidebar
+			? '  md:max-w-[calc(100%-260px)]'
+			: ' '} w-full max-w-full flex flex-col"
+		id="chat-container"
+	>
 	{#if !loading}
 		<div in:fade={{ duration: 50 }} class="w-full h-full flex flex-col">
 			{#if $settings?.backgroundImageUrl ?? $config?.license_metadata?.background_image_url ?? null}
@@ -2372,4 +2383,5 @@
 			</div>
 		</div>
 	{/if}
-</div>
+	</div>
+</C1ChatWrapper>
